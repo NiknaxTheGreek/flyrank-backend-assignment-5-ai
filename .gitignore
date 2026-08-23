@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+*.egg-info/
+verification/runs/*/cache/

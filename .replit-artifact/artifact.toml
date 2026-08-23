@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "FlyRank Polite Scraper"
+description = "A standalone Python Books to Scrape catalogue scraper with robots.txt compliance, throttling, caching, validation, deduplication, JSON and CSV serialization, metrics, automated tests, and observed live verification evidence."
+version = "1.0.0"
+id = "artifacts/flyrank-polite-scraper"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20232
+
+[services.development]
+run = "pnpm --filter @workspace/flyrank-polite-scraper run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/flyrank-polite-scraper", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/flyrank-polite-scraper/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20232"
+BASE_PATH = "/"
