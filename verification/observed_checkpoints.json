@@ -1,342 +1,128 @@
 {
   "target": "https://books.toscrape.com/",
-  "user_agent": "FlyRank-PoliteScraper/1.0 (+https://github.com/flyrank/backend-assignment-5)",
-  "run_at": "2026-08-22T11:06:10.568322+00:00",
+  "user_agent": "FlyRank-PoliteScraper/1.0 (+https://github.com/NiknaxTheGreek/flyrank-backend-assignment-5-ai)",
+  "run_at": "2026-08-24T07:24:20.127110+00:00",
   "checkpoints": [
     {
-      "name": "clean-cache-pages-1-3",
+      "name": "clean",
       "status": "PASS",
-      "requested_pages": [
-        1,
-        2,
-        3
+      "catalogue_pages": [
+        "https://books.toscrape.com/index.html",
+        "https://books.toscrape.com/catalogue/page-2.html",
+        "https://books.toscrape.com/catalogue/page-3.html"
       ],
-      "expected": "clean",
-      "observed": {
-        "run_label": "clean-cache-pages-1-3",
-        "started_at": "2026-08-22T11:06:06.809770+00:00",
-        "finished_at": "2026-08-22T11:06:08.651805+00:00",
-        "pages_attempted": 3,
-        "pages_succeeded": 3,
-        "pages_failed": 0,
-        "network_fetches": 3,
-        "cache_hits": 0,
-        "robots_fetches": 1,
-        "robots_cache_hits": 0,
-        "robots_decisions": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 3,
-            "url": "https://books.toscrape.com/catalogue/page-3.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          }
-        ],
-        "request_timeout_seconds": 10,
-        "minimum_throttle_seconds": 0.5,
-        "network_fetch_attempts": 4,
-        "measured_inter_network_fetch_seconds": [
-          0.5002370419999806,
-          0.5001212399999986,
-          0.5001028440001392
-        ],
-        "minimum_measured_inter_network_fetch_seconds": 0.5001028440001392,
-        "throttle_floor_observed": true,
-        "parsed_records": 60,
-        "accepted_records": 60,
-        "rejected_records": 0,
-        "duplicates": 0,
-        "validation_failures": 0,
-        "output_artifacts": {
-          "json": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/clean_cache/output/accepted_books.json",
-          "csv": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/clean_cache/output/accepted_books.csv",
-          "json_records": 60,
-          "csv_records": 60,
-          "json_bytes": 16008,
-          "csv_bytes": 8824,
-          "report": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/clean_cache/output/run_report.json"
-        },
-        "page_results": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": false,
-            "network_fetch": true,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": false,
-            "network_fetch": true,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 3,
-            "url": "https://books.toscrape.com/catalogue/page-3.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": false,
-            "network_fetch": true,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          }
-        ]
-      }
+      "catalogue_pages_succeeded": 3,
+      "discovered_books": 60,
+      "unique_book_urls": 60,
+      "detail_pages_attempted": 60,
+      "detail_pages_succeeded": 60,
+      "detail_pages_failed": 0,
+      "valid_records": 60,
+      "invalid_records": 0,
+      "cache_hits": 0,
+      "network_fetches": 63,
+      "network_fetch_attempts": 64,
+      "retry_attempts": 0,
+      "minimum_throttle_seconds": 0.5,
+      "minimum_measured_inter_network_fetch_seconds": 0.5000810039999948,
+      "throttle_floor_observed": true,
+      "failed_pages": [],
+      "output_files": ["books.json", "errors.json", "run-report.json"],
+      "output_field_names": [
+        "availability_text",
+        "description",
+        "fetched_at",
+        "price_gbp",
+        "price_text",
+        "product_url",
+        "rating_text",
+        "source_page",
+        "title"
+      ],
+      "run_report_duration_seconds": 31.887
     },
     {
-      "name": "warm-cache-pages-1-3",
+      "name": "warm",
       "status": "PASS",
-      "requested_pages": [
-        1,
-        2,
-        3
+      "catalogue_pages": [
+        "https://books.toscrape.com/index.html",
+        "https://books.toscrape.com/catalogue/page-2.html",
+        "https://books.toscrape.com/catalogue/page-3.html"
       ],
-      "expected": "warm",
-      "observed": {
-        "run_label": "warm-cache-pages-1-3",
-        "started_at": "2026-08-22T11:06:08.653216+00:00",
-        "finished_at": "2026-08-22T11:06:08.866655+00:00",
-        "pages_attempted": 3,
-        "pages_succeeded": 3,
-        "pages_failed": 0,
-        "network_fetches": 0,
-        "cache_hits": 3,
-        "robots_fetches": 1,
-        "robots_cache_hits": 0,
-        "robots_decisions": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 3,
-            "url": "https://books.toscrape.com/catalogue/page-3.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          }
-        ],
-        "request_timeout_seconds": 10,
-        "minimum_throttle_seconds": 0.5,
-        "network_fetch_attempts": 1,
-        "measured_inter_network_fetch_seconds": [],
-        "minimum_measured_inter_network_fetch_seconds": null,
-        "throttle_floor_observed": null,
-        "parsed_records": 60,
-        "accepted_records": 60,
-        "rejected_records": 0,
-        "duplicates": 0,
-        "validation_failures": 0,
-        "output_artifacts": {
-          "json": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/warm_cache/output/accepted_books.json",
-          "csv": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/warm_cache/output/accepted_books.csv",
-          "json_records": 60,
-          "csv_records": 60,
-          "json_bytes": 16008,
-          "csv_bytes": 8824,
-          "report": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/warm_cache/output/run_report.json"
-        },
-        "page_results": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": true,
-            "network_fetch": false,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": true,
-            "network_fetch": false,
-            "network_attempted": false,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 3,
-            "url": "https://books.toscrape.com/catalogue/page-3.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": true,
-            "network_fetch": false,
-            "network_attempted": false,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          }
-        ]
-      }
+      "catalogue_pages_succeeded": 3,
+      "discovered_books": 60,
+      "unique_book_urls": 60,
+      "detail_pages_attempted": 60,
+      "detail_pages_succeeded": 60,
+      "detail_pages_failed": 0,
+      "valid_records": 60,
+      "invalid_records": 0,
+      "cache_hits": 63,
+      "network_fetches": 0,
+      "network_fetch_attempts": 1,
+      "retry_attempts": 0,
+      "minimum_throttle_seconds": 0.5,
+      "minimum_measured_inter_network_fetch_seconds": null,
+      "throttle_floor_observed": null,
+      "failed_pages": [],
+      "output_files": ["books.json", "errors.json", "run-report.json"],
+      "output_field_names": [
+        "availability_text",
+        "description",
+        "fetched_at",
+        "price_gbp",
+        "price_text",
+        "product_url",
+        "rating_text",
+        "source_page",
+        "title"
+      ],
+      "run_report_duration_seconds": 0.399
     },
     {
-      "name": "partial-failure-pages-1-2-and-unavailable-9999",
+      "name": "broken",
       "status": "PASS",
-      "requested_pages": [
-        1,
-        2,
-        9999
+      "catalogue_pages": [
+        "https://books.toscrape.com/index.html",
+        "https://books.toscrape.com/catalogue/page-2.html",
+        "https://books.toscrape.com/catalogue/page-3.html"
       ],
-      "expected": "partial",
-      "observed": {
-        "run_label": "partial-failure-pages-1-2-and-unavailable-9999",
-        "started_at": "2026-08-22T11:06:08.867204+00:00",
-        "finished_at": "2026-08-22T11:06:10.567566+00:00",
-        "pages_attempted": 3,
-        "pages_succeeded": 2,
-        "pages_failed": 1,
-        "network_fetches": 2,
-        "cache_hits": 0,
-        "robots_fetches": 1,
-        "robots_cache_hits": 0,
-        "robots_decisions": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          },
-          {
-            "page": 9999,
-            "url": "https://books.toscrape.com/catalogue/page-9999.html",
-            "allowed": true,
-            "robots_url": "https://books.toscrape.com/robots.txt",
-            "policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt"
-          }
-        ],
-        "request_timeout_seconds": 10,
-        "minimum_throttle_seconds": 0.5,
-        "network_fetch_attempts": 4,
-        "measured_inter_network_fetch_seconds": [
-          0.500094947999969,
-          0.5001311660000738,
-          0.5001109339998493
-        ],
-        "minimum_measured_inter_network_fetch_seconds": 0.500094947999969,
-        "throttle_floor_observed": true,
-        "parsed_records": 40,
-        "accepted_records": 40,
-        "rejected_records": 0,
-        "duplicates": 0,
-        "validation_failures": 0,
-        "output_artifacts": {
-          "json": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/partial_failure/output/accepted_books.json",
-          "csv": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/partial_failure/output/accepted_books.csv",
-          "json_records": 40,
-          "csv_records": 40,
-          "json_bytes": 10531,
-          "csv_bytes": 5759,
-          "report": "/home/runner/workspace/artifacts/flyrank-polite-scraper/verification/runs/partial_failure/output/run_report.json"
-        },
-        "page_results": [
-          {
-            "page": 1,
-            "url": "https://books.toscrape.com/index.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": false,
-            "network_fetch": true,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 2,
-            "url": "https://books.toscrape.com/catalogue/page-2.html",
-            "succeeded": true,
-            "records": 20,
-            "cache_hit": false,
-            "network_fetch": true,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": null
-          },
-          {
-            "page": 9999,
-            "url": "https://books.toscrape.com/catalogue/page-9999.html",
-            "succeeded": false,
-            "records": 0,
-            "cache_hit": false,
-            "network_fetch": false,
-            "network_attempted": true,
-            "robots_allowed": true,
-            "robots_policy_source": "unavailable_default_allow",
-            "robots_fetch_error": "HTTP 404 for https://books.toscrape.com/robots.txt",
-            "error": "HTTP 404 for https://books.toscrape.com/catalogue/page-9999.html"
-          }
-        ]
-      }
+      "catalogue_pages_succeeded": 3,
+      "discovered_books": 60,
+      "unique_book_urls": 60,
+      "detail_pages_attempted": 61,
+      "detail_pages_succeeded": 60,
+      "detail_pages_failed": 1,
+      "valid_records": 60,
+      "invalid_records": 0,
+      "cache_hits": 63,
+      "network_fetches": 0,
+      "network_fetch_attempts": 2,
+      "retry_attempts": 0,
+      "minimum_throttle_seconds": 0.5,
+      "minimum_measured_inter_network_fetch_seconds": 0.5000966030000029,
+      "throttle_floor_observed": true,
+      "failed_pages": [
+        {
+          "url": "https://books.toscrape.com/catalogue/definitely-missing-flyrank-book/index.html",
+          "stage": "fetch_detail",
+          "error": "HTTP 404 for https://books.toscrape.com/catalogue/definitely-missing-flyrank-book/index.html",
+          "source_page": 3
+        }
+      ],
+      "output_files": ["books.json", "errors.json", "run-report.json"],
+      "output_field_names": [
+        "availability_text",
+        "description",
+        "fetched_at",
+        "price_gbp",
+        "price_text",
+        "product_url",
+        "rating_text",
+        "source_page",
+        "title"
+      ],
+      "run_report_duration_seconds": 0.839
     }
   ]
 }
