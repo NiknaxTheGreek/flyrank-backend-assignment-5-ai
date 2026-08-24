@@ -13,161 +13,178 @@ from polite_scraper.pipeline import PoliteScraper
 
 
 VERIFICATION_ROOT = ROOT / "verification"
+BROKEN_URL = (
+    "https://books.toscrape.com/catalogue/"
+    "definitely-missing-flyrank-book/index.html"
+)
+REQUIRED_FIELDS = {
+    "title",
+    "product_url",
+    "price_text",
+    "price_gbp",
+    "availability_text",
+    "rating_text",
+    "description",
+    "source_page",
+    "fetched_at",
+}
 
 
-def checkpoint(
-    name: str,
-    pages: list[int],
-    cache_dir: Path,
-    output_dir: Path,
-    *,
-    expected: str,
-) -> dict[str, object]:
-    try:
-        config = ScraperConfig(
-            base_url=DEFAULT_BASE_URL,
-            user_agent=DEFAULT_USER_AGENT,
-            timeout_seconds=10,
-            min_delay_seconds=0.5,
-            cache_dir=cache_dir,
-            output_dir=output_dir,
+def load_json(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def summarize(name: str, report, output_dir: Path, *, expected: str) -> dict[str, object]:
+    books = load_json(output_dir / "books.json")
+    errors = load_json(output_dir / "errors.json")
+    run_report = load_json(output_dir / "run-report.json")
+    fields_ok = bool(books) and set(books[0]) == REQUIRED_FIELDS
+
+    common = (
+        report.catalogue_pages_succeeded == 3
+        and report.catalogue_pages_failed == 0
+        and report.discovered_books == 60
+        and report.unique_book_urls == 60
+        and report.valid_records == 60
+        and report.invalid_records == 0
+        and len(books) == 60
+        and len({book["product_url"] for book in books}) == 60
+        and fields_ok
+        and Path(report.output_artifacts["books"]).name == "books.json"
+        and Path(report.output_artifacts["errors"]).name == "errors.json"
+        and Path(report.output_artifacts["run_report"]).name == "run-report.json"
+    )
+
+    if expected == "clean":
+        passed = (
+            common
+            and report.detail_pages_attempted == 60
+            and report.detail_pages_succeeded == 60
+            and report.detail_pages_failed == 0
+            and errors == []
+            and report.throttle_floor_observed is True
         )
-        report = PoliteScraper(config).run(pages, run_label=name)
-        summary = report.to_dict()
-        decisions = summary["robots_decisions"]
-        safety_observed = (
-            summary["request_timeout_seconds"] > 0
-            and summary["minimum_throttle_seconds"] >= 0.5
-            and all(decision["allowed"] is True for decision in decisions)
+    elif expected == "warm":
+        passed = (
+            common
+            and report.detail_pages_attempted == 60
+            and report.detail_pages_succeeded == 60
+            and report.detail_pages_failed == 0
+            and errors == []
+            and report.cache_hits >= 63
+            and report.network_fetches == 0
         )
-        if expected == "clean":
-            passed = (
-                report.pages_succeeded == len(pages)
-                and report.pages_failed == 0
-                and safety_observed
-                and summary["throttle_floor_observed"] is True
-            )
-        elif expected == "warm":
-            passed = (
-                report.pages_succeeded == len(pages)
-                and report.pages_failed == 0
-                and report.cache_hits == len(pages)
-                and report.network_fetches == 0
-                and safety_observed
-                and summary["throttle_floor_observed"] is None
-            )
-        else:
-            passed = (
-                report.pages_failed == 1
-                and report.pages_succeeded == len(pages) - 1
-                and report.accepted_records > 0
-                and safety_observed
-                and summary["throttle_floor_observed"] is True
-            )
-        return {
-            "name": name,
-            "status": "PASS" if passed else "NOT_COMPLETED",
-            "requested_pages": pages,
-            "expected": expected,
-            "observed": summary,
-        }
-    except Exception as exc:
-        return {
-            "name": name,
-            "status": "NOT_COMPLETED",
-            "requested_pages": pages,
-            "expected": expected,
-            "error": f"{type(exc).__name__}: {exc}",
-        }
+    elif expected == "broken":
+        passed = (
+            common
+            and report.detail_pages_attempted == 61
+            and report.detail_pages_succeeded == 60
+            and report.detail_pages_failed == 1
+            and len(errors) == 1
+            and errors[0]["url"] == BROKEN_URL
+            and errors[0]["stage"] == "fetch_detail"
+            and "HTTP 404" in errors[0]["error"]
+        )
+    else:
+        raise ValueError(expected)
+
+    return {
+        "name": name,
+        "status": "PASS" if passed else "FAIL",
+        "catalogue_pages": report.catalogue_pages,
+        "catalogue_pages_succeeded": report.catalogue_pages_succeeded,
+        "discovered_books": report.discovered_books,
+        "unique_book_urls": report.unique_book_urls,
+        "detail_pages_attempted": report.detail_pages_attempted,
+        "detail_pages_succeeded": report.detail_pages_succeeded,
+        "detail_pages_failed": report.detail_pages_failed,
+        "valid_records": report.valid_records,
+        "invalid_records": report.invalid_records,
+        "cache_hits": report.cache_hits,
+        "network_fetches": report.network_fetches,
+        "network_fetch_attempts": report.network_fetch_attempts,
+        "retry_attempts": report.retry_attempts,
+        "minimum_throttle_seconds": report.minimum_throttle_seconds,
+        "minimum_measured_inter_network_fetch_seconds": report.minimum_measured_inter_network_fetch_seconds,
+        "throttle_floor_observed": report.throttle_floor_observed,
+        "failed_pages": report.failed_pages,
+        "output_files": sorted(path.name for path in output_dir.iterdir() if path.is_file()),
+        "output_field_names": sorted(books[0].keys()) if books else [],
+        "run_report_duration_seconds": run_report["duration_seconds"],
+    }
 
 
 def main() -> int:
     runs = VERIFICATION_ROOT / "runs"
     if runs.exists():
         shutil.rmtree(runs)
-    clean_cache = runs / "clean_cache" / "cache"
-    clean_output = runs / "clean_cache" / "output"
-    warm_cache = clean_cache
-    warm_output = runs / "warm_cache" / "output"
-    partial_cache = runs / "partial_failure" / "cache"
-    partial_output = runs / "partial_failure" / "output"
+    shared_cache = runs / "shared-cache"
 
-    results = [
-        checkpoint(
-            "clean-cache-pages-1-3",
-            [1, 2, 3],
-            clean_cache,
-            clean_output,
-            expected="clean",
-        ),
-        checkpoint(
-            "warm-cache-pages-1-3",
-            [1, 2, 3],
-            warm_cache,
-            warm_output,
-            expected="warm",
-        ),
-        checkpoint(
-            "partial-failure-pages-1-2-and-unavailable-9999",
-            [1, 2, 9999],
-            partial_cache,
-            partial_output,
-            expected="partial",
-        ),
-    ]
+    clean_output = runs / "clean" / "output"
+    clean = PoliteScraper(
+        ScraperConfig(
+            base_url=DEFAULT_BASE_URL,
+            user_agent=DEFAULT_USER_AGENT,
+            timeout_seconds=10,
+            min_delay_seconds=0.5,
+            cache_dir=shared_cache,
+            output_dir=clean_output,
+        )
+    ).run(run_label="clean-first-three-pages")
+    clean_summary = summarize("clean", clean, clean_output, expected="clean")
+
+    warm_output = runs / "warm" / "output"
+    warm = PoliteScraper(
+        ScraperConfig(
+            base_url=DEFAULT_BASE_URL,
+            user_agent=DEFAULT_USER_AGENT,
+            timeout_seconds=10,
+            min_delay_seconds=0.5,
+            cache_dir=shared_cache,
+            output_dir=warm_output,
+        )
+    ).run(run_label="warm-cache-rerun")
+    warm_summary = summarize("warm", warm, warm_output, expected="warm")
+
+    broken_output = runs / "broken" / "output"
+    broken = PoliteScraper(
+        ScraperConfig(
+            base_url=DEFAULT_BASE_URL,
+            user_agent=DEFAULT_USER_AGENT,
+            timeout_seconds=10,
+            min_delay_seconds=0.5,
+            cache_dir=shared_cache,
+            output_dir=broken_output,
+        )
+    ).run(
+        run_label="sixty-real-plus-one-broken",
+        extra_detail_urls=[BROKEN_URL],
+    )
+    broken_summary = summarize("broken", broken, broken_output, expected="broken")
+
     evidence = {
         "target": DEFAULT_BASE_URL,
         "user_agent": DEFAULT_USER_AGENT,
-        "run_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
-        "checkpoints": results,
+        "run_at": __import__("datetime").datetime.now(
+            __import__("datetime").timezone.utc
+        ).isoformat(),
+        "checkpoints": [clean_summary, warm_summary, broken_summary],
     }
     VERIFICATION_ROOT.mkdir(parents=True, exist_ok=True)
-    evidence_path = VERIFICATION_ROOT / "observed_checkpoints.json"
-    evidence_path.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8")
-    markdown = [
-        "# Verification Evidence",
-        "",
-        f"Target: `{DEFAULT_BASE_URL}`",
-        f"User-Agent: `{DEFAULT_USER_AGENT}`",
-        "",
-        "This file is generated by `python tools/live_verification.py`. It records only observations from the run immediately above; a checkpoint marked `NOT_COMPLETED` is not presented as a success.",
-        "",
-    ]
-    for result in results:
-        markdown.extend(
-            [
-                f"## {result['name']}",
-                "",
-                f"- Status: **{result['status']}**",
-                f"- Requested pages: `{result['requested_pages']}`",
-                f"- Expected condition: `{result['expected']}`",
-            ]
-        )
-        observed = result.get("observed")
-        if isinstance(observed, dict):
-            markdown.extend(
-                [
-                    f"- Pages attempted/succeeded/failed: `{observed['pages_attempted']}/{observed['pages_succeeded']}/{observed['pages_failed']}`",
-                    f"- Network fetches/cache hits: `{observed['network_fetches']}/{observed['cache_hits']}`",
-                    f"- Robots decisions: `{observed['robots_decisions']}`",
-                    f"- Request timeout/minimum throttle: `{observed['request_timeout_seconds']}s/{observed['minimum_throttle_seconds']}s`",
-                    f"- Network attempts/inter-fetch intervals: `{observed['network_fetch_attempts']}/{observed['measured_inter_network_fetch_seconds']}`",
-                    f"- Minimum measured interval/throttle floor observed: `{observed['minimum_measured_inter_network_fetch_seconds']}/{observed['throttle_floor_observed']}`",
-                    f"- Parsed/accepted/rejected: `{observed['parsed_records']}/{observed['accepted_records']}/{observed['rejected_records']}`",
-                    f"- Duplicates/validation failures: `{observed['duplicates']}/{observed['validation_failures']}`",
-                    f"- Output artifacts: `{observed['output_artifacts']}`",
-                ]
-            )
-        elif "error" in result:
-            markdown.append(f"- Error observed: `{result['error']}`")
-        markdown.append("")
-    markdown_text = "\n".join(markdown)
-    (VERIFICATION_ROOT / "VERIFICATION_EVIDENCE.md").write_text(
-        markdown_text, encoding="utf-8"
+    (VERIFICATION_ROOT / "observed_checkpoints.json").write_text(
+        json.dumps(evidence, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
     )
-    (ROOT / "VERIFICATION_EVIDENCE.md").write_text(markdown_text, encoding="utf-8")
-    print(json.dumps(evidence, indent=2))
-    return 0 if all(item["status"] == "PASS" for item in results) else 1
+    shutil.copy2(clean_output / "run-report.json", VERIFICATION_ROOT / "clean-run-report.json")
+    shutil.copy2(broken_output / "run-report.json", VERIFICATION_ROOT / "broken-run-report.json")
+    sample = load_json(clean_output / "books.json")[0]
+    (VERIFICATION_ROOT / "sample-book.json").write_text(
+        json.dumps(sample, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+    print(json.dumps(evidence, indent=2, ensure_ascii=False))
+    return 0 if all(item["status"] == "PASS" for item in evidence["checkpoints"]) else 1
 
 
 if __name__ == "__main__":
