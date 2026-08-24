@@ -5,7 +5,10 @@ from pathlib import Path
 
 
 DEFAULT_BASE_URL = "https://books.toscrape.com/"
-DEFAULT_USER_AGENT = "FlyRank-PoliteScraper/1.0 (+https://github.com/flyrank/backend-assignment-5)"
+DEFAULT_USER_AGENT = (
+    "FlyRank-PoliteScraper/1.0 "
+    "(+https://github.com/NiknaxTheGreek/flyrank-backend-assignment-5-ai)"
+)
 
 
 @dataclass(frozen=True)
@@ -25,8 +28,6 @@ class ScraperConfig:
         if not self.user_agent.strip():
             raise ValueError("user_agent must not be empty")
 
-    def page_url(self, page: int) -> str:
-        if page < 1:
-            raise ValueError("catalogue page must be at least 1")
-        suffix = "" if page == 1 else f"catalogue/page-{page}.html"
-        return self.base_url.rstrip("/") + ("/index.html" if page == 1 else f"/{suffix}")
+    @property
+    def first_catalogue_url(self) -> str:
+        return self.base_url.rstrip("/") + "/index.html"
