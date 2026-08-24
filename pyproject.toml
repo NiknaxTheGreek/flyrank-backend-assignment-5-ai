@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flyrank-polite-scraper"
-version = "1.0.0"
-description = "A polite, validated Books to Scrape catalogue scraper for FlyRank Backend Assignment 5"
+version = "1.1.0"
+description = "A polite, validated Books to Scrape detail-page scraper for FlyRank Backend Assignment 5"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "FlyRank assignment submission" }]
-dependencies = []
+dependencies = [
+    "pydantic>=2.10,<3",
+]
 
 [project.scripts]
 polite-scraper = "polite_scraper.cli:main"

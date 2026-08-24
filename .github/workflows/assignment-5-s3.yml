@@ -1,0 +1,53 @@
+name: Assignment 5 S3 Gate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "polite_scraper/**"
+      - "tests/**"
+      - "tools/live_verification.py"
+      - "pyproject.toml"
+      - ".github/workflows/assignment-5-s3.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Compile Python sources
+        run: python -m compileall -q polite_scraper tools tests
+
+      - name: Run deterministic contract tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Run live Books to Scrape verification
+        run: python tools/live_verification.py
+
+      - name: Upload live evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: assignment-5-s3-evidence
+          path: verification/
+          if-no-files-found: warn

@@ -10,4 +10,6 @@ dist/
 build/
 *.tsbuildinfo
 *.egg-info/
-verification/runs/*/cache/
+cache/
+output/
+verification/runs/
