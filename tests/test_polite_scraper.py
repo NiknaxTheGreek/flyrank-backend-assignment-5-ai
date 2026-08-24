@@ -104,7 +104,7 @@ class PoliteFetcherTests(unittest.TestCase):
             now[0] += seconds
 
         fetcher, temp = self.make_fetcher(
-            lambda _request, _timeout: Response("ok"),
+            lambda _request, timeout: Response("ok"),
             sleep_fn=sleep,
             clock_fn=lambda: now[0],
         )
@@ -117,7 +117,7 @@ class PoliteFetcherTests(unittest.TestCase):
     def test_timeout_is_retried_exactly_once(self) -> None:
         calls = [0]
 
-        def opener(_request: Request, _timeout: float) -> Response:
+        def opener(_request: Request, timeout: float) -> Response:
             calls[0] += 1
             if calls[0] == 1:
                 raise TimeoutError("socket timeout")
@@ -133,7 +133,7 @@ class PoliteFetcherTests(unittest.TestCase):
     def test_5xx_is_retried_exactly_once(self) -> None:
         calls = [0]
 
-        def opener(request: Request, _timeout: float) -> Response:
+        def opener(request: Request, timeout: float) -> Response:
             calls[0] += 1
             if calls[0] == 1:
                 raise HTTPError(request.full_url, 503, "unavailable", {}, None)
@@ -150,7 +150,7 @@ class PoliteFetcherTests(unittest.TestCase):
             with self.subTest(status=status):
                 calls = [0]
 
-                def opener(request: Request, _timeout: float, code=status) -> Response:
+                def opener(request: Request, timeout: float, code=status) -> Response:
                     calls[0] += 1
                     raise HTTPError(request.full_url, code, "blocked", {}, None)
 
@@ -165,7 +165,7 @@ class PoliteFetcherTests(unittest.TestCase):
     def test_successful_response_cache_prevents_second_network_request(self) -> None:
         calls = [0]
 
-        def opener(_request: Request, _timeout: float) -> Response:
+        def opener(_request: Request, timeout: float) -> Response:
             calls[0] += 1
             return Response("cached body")
 
@@ -266,8 +266,9 @@ class StaticFetcher:
 
 
 def catalogue_html(start: int, end: int, next_href: str | None) -> str:
+    prefix = "catalogue/" if start == 1 else ""
     books = "".join(
-        f'<article class="product_pod"><h3><a href="book-{number}/index.html">Book</a></h3></article>'
+        f'<article class="product_pod"><h3><a href="{prefix}book-{number}/index.html">Book</a></h3></article>'
         for number in range(start, end + 1)
     )
     next_link = f'<li class="next"><a href="{next_href}">next</a></li>' if next_href else ""
